@@ -101,7 +101,7 @@
                         <li v-for="dataItem in item.datas" :key="dataItem.artID">
                             <router-link :to="'/goodsinfo/'+dataItem.artID" class="">
                                 <div class="img-box">
-                                    <img :src="dataItem.img_url">
+                                    <img v-lazy="dataItem.img_url">
                                 </div>
                                 <div class="info">
                                     <h3>{{dataItem.artTitle}}</h3>

@@ -23,9 +23,9 @@
                             <a>退出</a>
                             <strong>|</strong>
                         </span>
-                        <router-link to="/shopcart" class="">
+                        <router-link to="/shopcart" id="shoppingCartCount" class="">
                             <i class="iconfont icon-cart"></i>购物车(
-                            <span id="shoppingCartCount">
+                            <span >
                                 <span>4</span>
                             </span>)</router-link>
                     </div>

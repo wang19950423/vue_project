@@ -3,11 +3,17 @@ import Vue from 'vue'
 import VueRouter from 'vue-router';
 import ElementUI from 'element-ui';
 import moment from 'moment'
+import VueLazyload from 'vue-lazyload'
+
 
 
 //集成中间件/插件【注意：必须是基于Vue的】
 Vue.use(VueRouter)
 Vue.use(ElementUI);
+Vue.use(VueLazyload,{
+    loading:"http://img.lanrentuku.com/img/allimg/1212/5-121204193R0-50.gif"
+})
+
 
 //导入根组件
 import App from './App.vue'
