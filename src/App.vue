@@ -23,10 +23,10 @@
                             <a>退出</a>
                             <strong>|</strong>
                         </span>
-                        <router-link to="/shopcart" id="shoppingCartCount" class="">
-                            <i class="iconfont icon-cart"></i>购物车(
+                        <router-link to="/shopcart" class="">
+                            <i id="shoppingCartCount" class="iconfont icon-cart"></i>购物车(
                             <span >
-                                <span>4</span>
+                                <span>{{this.$store.getters.getBuyCount}}</span>
                             </span>)</router-link>
                     </div>
                 </div>

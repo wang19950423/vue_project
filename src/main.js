@@ -4,6 +4,7 @@ import VueRouter from 'vue-router';
 import ElementUI from 'element-ui';
 import moment from 'moment'
 import VueLazyload from 'vue-lazyload'
+import Vuex from 'vuex'
 
 
 
@@ -13,6 +14,7 @@ Vue.use(ElementUI);
 Vue.use(VueLazyload,{
     loading:"http://img.lanrentuku.com/img/allimg/1212/5-121204193R0-50.gif"
 })
+Vue.use(Vuex)
 
 
 //导入根组件
@@ -46,10 +48,32 @@ const router = new VueRouter({
         {path:'/shopcart',component:shopcart}
     ]
 })
+//按需导入
+import {addLocalGoods,getTotalCount,getLocalGoods} from './common/localStroageTool.js'
+const store = new Vuex.Store({
+    state:{
+        shopCount:0//加入购物车中的商品总数量，用在layout.vue的头部的购物车那个徽标上面
+    },
+    getters:{
+        getBuyCount(state){
+            if(state.shopCount>0){
+                return state.shopCount
+            }else{
+                return getTotalCount()
+            }
+        }
+    },
+    mutations:{
+        addGoods(state,goods){
+            state.shopCount = addLocalGoods(goods)
+        }
+    }
+})
 
 new Vue({
     el:'#app',
     router,
+    store,
     render:function(createElement){
         return createElement(App)
     }

@@ -220,6 +220,7 @@ export default {
       commentData: {}, //评论数据
       buyCount: 1, //购买的数量
       addToShopCartOffset: null, //动画开始时候的top、left
+      addToShopCar: null,
       isShowImg: false
     };
   },
@@ -233,17 +234,8 @@ export default {
     this.getGoodsDetail();
     this.getCommentData();
   },
-  mounted() {
-    setTimeout(() => {
-      //1.0 给动画的起始位置赋值
-      this.addToShopCar = $(this.$refs.addToShop).offset();
-      //2.0 设置要动画图片的位置
-      $("#animationId")
-        .css("left", this.addToShopCar.left + "px")
-        .css("top", this.addToShopCar.top + "px");
-
-      this.shoppingCartCount = $("#shoppingCartCount").offset();
-    }, 500);
+  updated() {
+    this.shoppingCartCount = $("#shoppingCartCount").offset();
   },
   components: {
     Affix: Affix
@@ -259,6 +251,13 @@ export default {
         this.goodsDetailData = res.data.message;
 
         setTimeout(() => {
+          //1.0 给动画的起始位置赋值
+          this.addToShopCar = $(this.$refs.addToShop).offset();
+          //2.0 设置要动画图片的位置
+          $("#animationId")
+            .css("left", this.addToShopCar.left + "px")
+            .css("top", this.addToShopCar.top + "px");
+
           $("#magnifier1").imgzoon({ magnifier: "#magnifier1" });
         }, 200);
       });
@@ -314,24 +313,31 @@ export default {
     },
     //加入购物车
     addToShopCart() {
-        this.isShowImg = true
+      this.isShowImg = true;
+      //调用Mutations方法，荷载就是参数
+      const goods = {
+        goodsid: this.$route.params.goodsid,
+        buyCount: this.buyCount
+      };
+      //   console.log(goodsObj)
+      this.$store.commit("addGoods", goods);
     },
     //购物车动画钩子函数
     beforeEnter: function(el) {
-         //设置动画的起始位置
-                el.style.left = `${this.addToShopCar.left}px`
-                el.style.top = `${this.addToShopCar.top}px`
+      //设置动画的起始位置
+      el.style.left = `${this.addToShopCar.left}px`;
+      el.style.top = `${this.addToShopCar.top}px`;
     },
     enter: function(el, done) {
-        // 刷新针
-                el.offsetWidth
-                // 设置结束位置
-                el.style.left = `${this.shoppingCartCount.left}px`
-                el.style.top = `${this.shoppingCartCount.top}px`
-                done()
+      // 刷新针
+      el.offsetWidth;
+      // 设置结束位置
+      el.style.left = `${this.shoppingCartCount.left}px`;
+      el.style.top = `${this.shoppingCartCount.top}px`;
+      done();
     },
     afterEnter: function(el) {
-        this.isShowImg = false
+      this.isShowImg = false;
     }
   }
 };
