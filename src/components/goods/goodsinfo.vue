@@ -205,10 +205,8 @@ img {
 
 <script>
 import "../../statics/site/js/jqimgzoom/js/magnifier.js";
-import axios from "axios";
 import { Affix } from "iview";
 
-const baseUrl = "http://47.106.148.205:8899/";
 
 export default {
   data() {
@@ -243,10 +241,10 @@ export default {
   methods: {
     //根据id获取数据
     getGoodsDetail() {
-      const url = `${baseUrl}site/goods/getgoodsinfo/${
+      const url = `site/goods/getgoodsinfo/${
         this.$route.params.goodsid
       }`;
-      axios.get(url).then(res => {
+      this.$axios.get(url).then(res => {
         // console.log(res.data.message);
         this.goodsDetailData = res.data.message;
 
@@ -268,10 +266,10 @@ export default {
     },
     //分页评论数据
     getCommentData() {
-      const url = `${baseUrl}site/comment/getbypage/goods/${
+      const url = `site/comment/getbypage/goods/${
         this.$route.params.goodsid
       }?pageIndex=${this.currentPage}&pageSize=${this.pageSize}`;
-      axios.get(url).then(res => {
+      this.$axios.get(url).then(res => {
         // console.log(res.data.message)
         this.commentData = res.data;
       });
@@ -297,10 +295,10 @@ export default {
         });
         return;
       }
-      const url = `${baseUrl}site/validate/comment/post/goods/${
+      const url = `site/validate/comment/post/goods/${
         this.$route.params.goodsid
       }`;
-      axios.post(url, { commenttxt }).then(res => {
+      this.$axios.post(url, { commenttxt }).then(res => {
         if (res.data.status == 1) {
           this.$message.error(res.data.message);
           return;

@@ -11,16 +11,16 @@
                         <a target="_blank" href="#"></a>
                     </div>
                     <div id="menu" class="right-box">
-                        <span style="display: none;">
-                            <a href="" class="">登录</a>
+                        <span v-show="!isLogin" style="display: none;">
+                            <router-link to="/login" class="">登录</router-link>
                             <strong>|</strong>
                             <a href="" class="">注册</a>
                             <strong>|</strong>
                         </span>
-                        <span>
+                        <span v-show="isLogin">
                             <a href="" class="">会员中心</a>
                             <strong>|</strong>
-                            <a>退出</a>
+                            <a @click="logout">退出</a>
                             <strong>|</strong>
                         </span>
                         <router-link to="/shopcart" class="">
@@ -120,9 +120,43 @@
 
 <script>
     import $ from 'jquery'
+    import {bus} from './common/bus.js'
 
     //加了default 就是默认导出
     export default {
+        
+        created(){
+            bus.$on('logined',isLogin=>{
+                this.isLogin = isLogin
+            })
+            this.judgeLogin()
+        },
+        methods:{
+            judgeLogin(){
+               this.$axios.get(`site/account/islogin`).then(res=>{
+                   console.log(res.data)
+                    if(res.data.code === 'logined'){
+                        this.isLogin = true
+                    }else{
+                        this.isLogin = false
+                    }
+                })
+            },
+            logout(){
+                this.$axios.get(`site/account/logout`).then(res=>{
+                    // console.log(res.data)
+                    if(res.data.status == 0){
+                        this.isLogin = false
+                        this.$router.push('goodslist')
+                    }
+                })
+            }
+        },
+        data(){
+            return{
+                isLogin:false
+            }
+        },
         mounted() {
             $("#menu2 li a").wrapInner('<span class="out"></span>');
             $("#menu2 li a").each(function () {

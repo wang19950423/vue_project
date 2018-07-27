@@ -1,8 +1,8 @@
 <template>
     <div>
-        <div class="sub">-</div>
+        <div class="sub" @click="sub">-</div>
         <div class="number">{{count}}</div>
-        <div class="add">+</div>
+        <div class="add" @click="add">+</div>
     </div>
 </template>
 
@@ -26,7 +26,8 @@
             initCount:{
                 type: Number,
                 default: 100
-            }
+            },
+            goodsId:Number
         },
         data(){
             return{
@@ -36,6 +37,26 @@
         created() {
             this.count = this.initCount
         },
+        methods:{
+            sub(){
+                if(this.count<=1){
+                    return
+                }
+                this.count--
+                this.notify()
+            },
+            add(){
+                this.count++
+                this.notify()
+            },
+            notify(){
+                const goods = {
+                    goodsId:this.goodsId,
+                    count:this.count
+                }
+                this.$emit("changeNumber",goods)
+            }
+        }
     }
 
 </script>

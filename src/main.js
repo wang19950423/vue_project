@@ -5,7 +5,7 @@ import ElementUI from 'element-ui';
 import moment from 'moment'
 import VueLazyload from 'vue-lazyload'
 import Vuex from 'vuex'
-
+import axios from 'axios'
 
 
 //集成中间件/插件【注意：必须是基于Vue的】
@@ -16,6 +16,12 @@ Vue.use(VueLazyload,{
 })
 Vue.use(Vuex)
 
+
+//导入axios
+
+axios.defaults.baseURL = "http://47.106.148.205:8899/"
+axios.defaults.withCredentials = true //允许携带cookie
+Vue.prototype.$axios = axios
 
 //导入根组件
 import App from './App.vue'
@@ -38,6 +44,8 @@ Vue.filter('moment', function (value, formatString) {
 import goodslist from './components/goods/goodslist.vue'
 import shopcart from './components/shopcart/shopcart.vue'
 import goodsinfo from './components/goods/goodsinfo.vue'
+import order from './components/order/order.vue'
+import login from './components/account/login.vue'
 
 
 const router = new VueRouter({
@@ -45,11 +53,39 @@ const router = new VueRouter({
         {path:'/',redirect:'/goodslist'},
         {path:'/goodslist',component:goodslist},
         {path:'/goodsinfo/:goodsid',component:goodsinfo},
-        {path:'/shopcart',component:shopcart}
+        {path:'/shopcart',component:shopcart},
+        {path:'/login',component:login},
+        {path:'/order',component:order,meta:{needLogin:true}}
     ]
 })
+
+
+//路由导航的配置
+router.beforeEach((to, from, next) => {
+    //保存去除login之外的上一个url浏览记录
+    if(to.fullPath != '/login'){
+        localStorage.setItem('toVisitPath',to.fullPath)
+    }
+
+    if(to.meta.needLogin){
+        axios.get('http://47.106.148.205:8899/site/account/islogin').then(res=>{
+            console.log(res.data)
+            if(res.data.code == 'nologin'){
+                router.push('login')
+            }else{
+                next()
+            }
+        })
+    }else{
+        next()
+    }
+    
+})
+
+
 //按需导入
-import {addLocalGoods,getTotalCount,getLocalGoods} from './common/localStroageTool.js'
+import {addLocalGoods,getTotalCount,getLocalGoods,updateLocalGoods,deleteLocalGoods} from './common/localStroageTool.js'
+//vuex的配置
 const store = new Vuex.Store({
     state:{
         shopCount:0//加入购物车中的商品总数量，用在layout.vue的头部的购物车那个徽标上面
@@ -64,8 +100,17 @@ const store = new Vuex.Store({
         }
     },
     mutations:{
+        //获取商品总数
         addGoods(state,goods){
             state.shopCount = addLocalGoods(goods)
+        },
+        updateGoods(state,goods){
+            // console.log(goods)
+            state.shopCount = updateLocalGoods(goods)
+        },
+        deleteGoods(state,goodsId){
+            // console.log(goodsId)
+            state.shopCount = deleteLocalGoods(goodsId)
         }
     }
 })

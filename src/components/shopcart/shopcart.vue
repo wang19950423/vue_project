@@ -54,7 +54,7 @@
                                     <th width="104" align="left">金额(元)</th>
                                     <th width="54" align="center">操作</th>
                                 </tr>
-                                <tr v-for="item in shopData" :key="item.id">
+                                <tr v-for="(item,index) in shopData" :key="item.id">
                                     <td width="48" align="center">
                                         <el-switch
                                             v-model="item.isSelected"
@@ -70,11 +70,11 @@
                                     </td>
                                     <td width="84" align="left">{{item.sell_price}}</td>
                                     <td width="104" align="center">
-                                        <inputnumber :initCount="item.buycount"></inputnumber>
+                                        <inputnumber :initCount="item.buycount" :goodsId="item.id" @changeNumber="changeCount"></inputnumber>
                                     </td>
                                     <td width="104" align="left">{{item.sell_price * item.buycount}}</td>
                                     <td width="54" align="center">
-                                        <a href="javascript:void(0)">删除</a>
+                                        <a @click="deleteGoods(item.id,index)" href="javascript:void(0)">删除</a>
                                     </td>
                                 </tr>
                                 <tr v-if="shopData.length==0">
@@ -106,8 +106,8 @@
                     <!--购物车底部-->
                     <div class="cart-foot clearfix">
                         <div class="right-box">
-                            <button class="button" onclick="javascript:location.href='/index.html';">继续购物</button>
-                            <button class="submit" onclick="formSubmit(this, '/', '/shopping.html');">立即结算</button>
+                            <button class="button" @click="toGoodsList">继续购物</button>
+                            <button class="submit" @click="toOrder">立即结算</button>
                         </div>
                     </div>
                     <!--购物车底部-->
@@ -119,82 +119,128 @@
 </template>
 
 <style scoped>
-    .shopInfo{
-        display: flex;
-        align-items: center;
-    }
+.shopInfo {
+  display: flex;
+  align-items: center;
+}
 </style>
 
 
 <script>
-    import {getLocalGoods} from '../../common/localStroageTool.js'
-    import inputnumber from '../subcomponents/inputnumber.vue'
-    import axios from 'axios'
-    const baseUrl = "http://47.106.148.205:8899/";
-    
-    export default {
-        data(){
-            return{
-                shopData:[],
-            }
-        },
-        created() {
-            this.getShopData()
-        },
-        components:{
-            inputnumber
-        },
-        computed:{
-            //计算商品总件数
-            getTotalCount(){
-                let toTalCount = 0
-                this.shopData.forEach(item=>{
-                    if(item.isSelected){
-                        toTalCount += item.buycount
-                    }
-                })
-                return toTalCount
-            },
-            //计算商品总价格
-            getTotalPrice(){
-                let totalPrice = 0
-                this.shopData.forEach(item=>{
-                    if(item.isSelected){
-                        totalPrice += item.buycount * item.sell_price
-                    }
-                })
-                return totalPrice
-            }
-        },
-        methods:{
-            getShopData(){
-                const localGoods = getLocalGoods()
-                console.log(localGoods)
-                
-                // let temArray = []
-                // for(const key in localGoods){
-                //     temArray.push(key)
-                // }                             //使用还是要join一下
-                // console.log(temArray)
+import { getLocalGoods } from "../../common/localStroageTool.js";
+import inputnumber from "../subcomponents/inputnumber.vue";
+import axios from "axios";
+const baseUrl = "http://47.106.148.205:8899/";
 
-                let temArray = Object.keys(localGoods).join(',')
-                // console.log(temArray)
-
-                const url = `${baseUrl}site/comment/getshopcargoods/${temArray}`
-                axios.get(url).then(res=>{
-                    console.log(res.data.message)
-                    //添加开关状态
-                    res.data.message.forEach(element => {
-                        //给buycount添加商品数量
-                        element.buycount = localGoods[element.id]
-                        //让开关默认是开着的
-                        element.isSelected = true
-                    });
-                    this.shopData = res.data.message
-                })
-
-            }
+export default {
+  data() {
+    return {
+      shopData: []
+    };
+  },
+  created() {
+    this.getShopData();
+  },
+  components: {
+    inputnumber
+  },
+  computed: {
+    //计算商品总件数
+    getTotalCount() {
+      let toTalCount = 0;
+      this.shopData.forEach(item => {
+        if (item.isSelected) {
+          toTalCount += item.buycount;
         }
+      });
+      return toTalCount;
+    },
+    //计算商品总价格
+    getTotalPrice() {
+      let totalPrice = 0;
+      this.shopData.forEach(item => {
+        if (item.isSelected) {
+          totalPrice += item.buycount * item.sell_price;
+        }
+      });
+      return totalPrice;
     }
+  },
+  methods: {
+    getShopData() {
+      const localGoods = getLocalGoods();
+      // console.log(localGoods)
 
+      // let temArray = []
+      // for(const key in localGoods){
+      //     temArray.push(key)
+      // }                             //使用还是要join一下
+      // console.log(temArray)
+
+      let temArray = Object.keys(localGoods).join(",");
+      if (Object.keys(localGoods).length == 0) return;
+      // console.log(temArray)
+
+      const url = `${baseUrl}site/comment/getshopcargoods/${temArray}`;
+      axios.get(url).then(res => {
+        console.log(res.data.message);
+        //添加开关状态
+        res.data.message.forEach(element => {
+          //给buycount添加商品数量
+          element.buycount = localGoods[element.id];
+          //让开关默认是开着的
+          element.isSelected = true;
+        });
+        this.shopData = res.data.message;
+      });
+    },
+    //改变商品总数
+    changeCount(goods) {
+      // console.log(goods)
+      this.shopData.forEach(item => {
+        if (goods.goodsId === item.id) {
+          item.buycount = goods.count;
+        }
+      });
+      //2.调用vuex的方法，更新购物车徽标的值，以及localStorage中的值
+      this.$store.commit("updateGoods", goods);
+    },
+    //删除商品
+    deleteGoods(goodsId, index) {
+    //   console.log(goodsId, index);
+      this.$confirm("是否要删除该商品?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      })
+        .then(() => {
+            this.shopData.splice(index,1)
+            this.$store.commit('deleteGoods',goodsId)
+        })
+        .catch(() => {});
+    },
+    //在去购物
+    toGoodsList(){
+        this.$router.push({path:'goodslist'})
+    },
+    //去订单页面
+    toOrder(){
+        let temArray = []
+        this.shopData.forEach(item=>{
+            if(item.isSelected){
+                temArray.push(item.id)
+            }
+        })
+        console.log(temArray)
+        if(temArray.length==0){
+            this.$message({
+                message: '至少选择一件商品才能结算！！！',
+                type: 'warning'
+            });
+        }
+
+        this.$router.push({path:'order',query:{ids:temArray.join(',')}})
+    }
+  }
+};
 </script>

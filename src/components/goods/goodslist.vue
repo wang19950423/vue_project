@@ -133,9 +133,6 @@
 
 <script>
     
-    import axios from 'axios'
-
-    const baseUrl = "http://47.106.148.205:8899/"
 
     //默认导出
     export default {
@@ -152,18 +149,18 @@
         methods: {
             //获取轮播图和其左右的数据
             getGoodsList(){
-                const url = `${baseUrl}site/goods/gettopdata/goods`
+                const url = `site/goods/gettopdata/goods`
 
-                axios.get(url).then(res=>{
+                this.$axios.get(url).then(res=>{
                     // console.log(res.data)
                     this.goodsList = res.data.message
                 })
             },
             //获取商品列表数据
             getGoodsListData(){
-                const url = `${baseUrl}site/goods/getgoodsgroup`
+                const url = `site/goods/getgoodsgroup`
 
-                axios.get(url).then(res=>{
+                this.$axios.get(url).then(res=>{
                     console.log(res.data)
                     this.goodsData = res.data.message
                 })

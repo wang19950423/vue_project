@@ -1,3 +1,4 @@
+import { Object } from "core-js";
 
 const key = 'goods'
 
@@ -37,4 +38,33 @@ export const addLocalGoods = (goodsObj)=>{
     localStorage.setItem(key,JSON.stringify(localGoods))
     //返回加入之后的总数量
     return getTotalCount()
+}
+
+
+//goodsObj = {goodsid:"87",count:2}   保存数据到本地
+//最终保存的格式 {"87":5,"94":2}
+export const updateLocalGoods = (goodsObj)=>{
+    //获取第一次保存的数据，可能为空
+    const localGoods = getLocalGoods()
+    // console.log(goodsObj)
+    localGoods[goodsObj.goodsId] = goodsObj.count
+    
+    //保存到本地中
+    localStorage.setItem(key,JSON.stringify(localGoods))
+    //返回加入之后的总数量
+    return getTotalCount()
+}
+
+
+export const deleteLocalGoods = (goodsId)=>{
+    //获取第一次保存的数据，可能为空
+    const localGoods = getLocalGoods()
+    // console.log(goodsId)
+
+    delete localGoods[goodsId]
+    //保存到本地中
+    localStorage.setItem(key,JSON.stringify(localGoods))
+    //返回加入之后的总数量
+    return getTotalCount()
+    
 }
