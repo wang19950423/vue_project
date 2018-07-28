@@ -46,6 +46,7 @@ import shopcart from './components/shopcart/shopcart.vue'
 import goodsinfo from './components/goods/goodsinfo.vue'
 import order from './components/order/order.vue'
 import login from './components/account/login.vue'
+import payOrder from './components/order/payOrder.vue'
 
 
 const router = new VueRouter({
@@ -55,7 +56,8 @@ const router = new VueRouter({
         {path:'/goodsinfo/:goodsid',component:goodsinfo},
         {path:'/shopcart',component:shopcart},
         {path:'/login',component:login},
-        {path:'/order',component:order,meta:{needLogin:true}}
+        {path:'/order',component:order,meta:{needLogin:true}},
+        {path:'/payOrder',component:payOrder,meta:{needLogin:true}}
     ]
 })
 
@@ -68,7 +70,7 @@ router.beforeEach((to, from, next) => {
     }
 
     if(to.meta.needLogin){
-        axios.get('http://47.106.148.205:8899/site/account/islogin').then(res=>{
+        axios.get('site/account/islogin').then(res=>{
             console.log(res.data)
             if(res.data.code == 'nologin'){
                 router.push('login')
